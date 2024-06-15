@@ -1,7 +1,8 @@
 !include LogicLib.nsh
 
-!define VERSION "1.0.0"
-!define APP_NAME 'CrystalM2'
+; Vars
+!define VERSION "1.0.0.1"
+!define APP_NAME "CrystalM2"
 
 ; Define Download URLs
 !define NET8_URL "https://download.visualstudio.microsoft.com/download/pr/76e5dbb2-6ae3-4629-9a84-527f8feb709c/09002599b32d5d01dc3aa5dcdffcc984/windowsdesktop-runtime-8.0.6-win-x64.exe"
@@ -12,39 +13,63 @@
 !define HELP_URL "https://www.lomcn.net/wiki/index.php/Crystal"
 !define ABOUT_URL "https://github.com/meacher0/CrystalM2-Installer"
 
-; Define Configuration
+; Define Client Network Configuration
 !define CLIENT_IP "127.0.0.1"
 !define CLIENT_PORT "7000"
+
+; Define Server Network Configuration
 !define SERVER_IP "0.0.0.0"
 !define SERVER_PORT "7000"
 
-; Set the name of installer
-Name "${APP_NAME}_${VERSION}"
+; Set name used for installer window
+Name "${APP_NAME} ${VERSION}"
+
+; Set Installer Exe's Properties\Details tab information
+!define LANG_ENGLISH "1033"
+VIProductVersion "${VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APP_NAME} Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "${APP_NAME} Installer Application"
+;VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Fake company"
+;VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalTrademarks" "${APP_NAME} is a trademark of Fake company"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Meacher0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APP_NAME} Installer Application"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}" 
+
+; Set the output file for the new installer binary
 Outfile "${APP_NAME}_setup_${VERSION}.exe"
 
-; Run-As Admin (some network and file operations require elevation)
+; Request Run-As Admin (some network and file operations require elevation)
 RequestExecutionLevel Admin
 
-# set prog files as install directory
+# Set "program files" as installation directory
 InstallDir "$PROGRAMFILES64\${APP_NAME}"
 
 ; Install section
 Section "Install Section"
+	; Let user know install is starting
+	MessageBox MB_ICONINFORMATION "CrystalM2 will now be installed to $INSTDIR"
+	
 	; Set output directory (installation path)
     SetOutPath $INSTDIR
+	
+	; Create directory
 	CreateDirectory $INSTDIR
+	
+	;Set directory permissions using security ID - Info: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers
 	AccessControl::GrantOnFile $INSTDIR "(S-1-5-32-545)" "FullAccess"
 	
     ; Check if .NET 8 is installed
-	ReadRegStr $0 HKLM "SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full" "Version"
-	${If} $0 == ""
-		; .NET 8 is NOT installed, Download...
+	ReadRegStr $0 HKLM "SOFTWARE\Classes\Installer\Dependencies\{942f6911-1a02-4186-8c4c-b27eb2b9733d}" "Version"
+	${If} $0 != "8.0.6.33720"
+		; .NET 8.0.6 is NOT installed, update GUI
 		DetailPrint "Downloading dotNET 8.0 Runtime..."
+		; Download dotNET 8.0.6 - Info: https://nsis.sourceforge.io/NScurl_plug-in
 		NScurl::http get "${NET8_URL}" "$INSTDIR\Downloads\dotnet-runtime-8.0.6-win-x64.exe" /INSIST /CANCEL /RESUME /POPUP /END
 		Pop $R0
 		${If} $R0 == "OK"
-			; Successfully downloaded, Install...
+			; Successfully downloaded, Update GUI
 			DetailPrint "Installing dotNET 8.0 Runtime..."
+			; Silently install dotNET 8.0.6
 			ExecWait '"$INSTDIR\Downloads\windowsdesktop-runtime-8.0.6-win-x64.exe" /install /quiet'
 		${Else}
 			; Handle download failure
@@ -52,16 +77,18 @@ Section "Install Section"
 		${EndIf}
 	${EndIf}
 	
-	; Check if Redistributable is installed
+	; Check if VC2013 Redistributable is installed
 	ReadRegDWORD $0 HKLM "SOFTWARE\Classes\Installer\Dependencies\{050d4fc8-5d48-4b8f-8972-47c82c46020f}" "Version"
-	${If} $0 != 12.0.30501.0
-		; redist not installed, Download...
+	${If} $0 != "12.0.30501.0"
+		; redist is NOT installed, update GUI
 		DetailPrint "Downloading Visual C++ 2013 Redistributable..."
+		; Download VC2013 redist - Info: https://nsis.sourceforge.io/NScurl_plug-in
 		NScurl::http get "${VCR13_URL}" "$INSTDIR\Downloads\vcredist_x64.exe" /INSIST /CANCEL /RESUME /POPUP /END
 		Pop $R0
 		${If} $R0 == "OK"
-			; Successfully downloaded, Install...
+			; Successfully downloaded, update GUI
 			DetailPrint "Installing Visual C++ 2013 Redist..."
+			; Silently install VC2013 redist
 			ExecWait '"$INSTDIR\Downloads\vcredist_x64.exe" /install /quiet'
 		${Else}
 			; Handle download failure
@@ -69,37 +96,42 @@ Section "Install Section"
 		${EndIf}
 	${EndIf}
 	
-	; Get CrystalM2 Stable Release
+	; Update GUI
 	DetailPrint "Downloading CrystalM2 [10MB]..."
+	; Get CrystalM2 Stable Release - Info: https://nsis.sourceforge.io/NScurl_plug-in
 	NScurl::http get "${SCCM2_URL}" "$INSTDIR\Downloads\CrystalM2Stable.zip" /INSIST /CANCEL /RESUME /END
 	Pop $R0
 	${If} $R0 == "OK"
-		; Successfully downloaded, install
+		; Successfully downloaded zip, update GUI
 		DetailPrint "Installing CrystalM2 Stable Release..."
+		; extract zip to "workspace" temp folder - Info: https://nsis.sourceforge.io/Nsisunz_plug-in
 		nsisunz::UnzipToLog "$INSTDIR\Downloads\CrystalM2Stable.zip" "$INSTDIR\Workspace"
+		; Copy extracted files to "Program Files"
 		CopyFiles "$INSTDIR\Workspace\Crystal_14.06.2024_Debug\*" $INSTDIR
-		
+		; Update GUI
+		DetailPrint "Downloading CrystalM2 Database [215MB]..."
+		; Get Crystal Databases zip
+		NScurl::http get "${DB_URL}" "$INSTDIR\Downloads\Databases.zip" /INSIST /CANCEL /RESUME /END
+		Pop $R0
+		${If} $R0 == "OK"
+			; Successfully downloaded zip, install
+			DetailPrint "Extracting CrystalM2 Database..."
+			; Extract zip to "Databases" temp folder - Info: https://nsis.sourceforge.io/Nsisunz_plug-in
+			nsisunz::UnzipToLog "$INSTDIR\Downloads\Databases.zip" "$INSTDIR\Databases"
+			; Update GUI
+			DetailPrint "Copying Jev's Database Files..."
+			; Copy files from temp folder to Server dir
+			CopyFiles "$INSTDIR\Databases\Crystal.Database-main\Jev\*" "$INSTDIR\Server"
+		${Else}
+			; Handle failure
+			MessageBox MB_ICONEXCLAMATION "Failed to install CrystalM2 Database$\nCheck Internet Connection"
+		${EndIf}
 	${Else}
-		; Handle download failure
-		MessageBox MB_ICONEXCLAMATION "Failed to install CrystalM2 Stable Release."
+		; Handle failure
+		MessageBox MB_ICONEXCLAMATION "Failed to install CrystalM2$\nCheck Internet connection"
 	${EndIf}
 
-	; Get Database
-	DetailPrint "Downloading CrystalM2 Database [215MB]..."
-	NScurl::http get "${DB_URL}" "$INSTDIR\Downloads\Databases.zip" /INSIST /CANCEL /RESUME /END
-	Pop $R0
-	${If} $R0 == "OK"
-		; Successfully downloaded, install
-		DetailPrint "Extracting CrystalM2 Database..."
-		nsisunz::UnzipToLog "$INSTDIR\Downloads\Databases.zip" "$INSTDIR\Databases"
-		DetailPrint "Copying Jev's Database Files..."
-		CopyFiles "$INSTDIR\Databases\Crystal.Database-main\Jev\*" "$INSTDIR\Server"
-	${Else}
-		; Handle download failure
-		MessageBox MB_ICONEXCLAMATION "Failed to install CrystalM2 Database."
-	${EndIf}
-
-	; Randomly Generate GMPassword
+	; Generate Random New GMPassword - taken from https://stackoverflow.com/questions/19195286/generate-a-10-digit-alphanumeric-string-in-nsis
 	StrCpy $2 ""
 	badrange:
 		System::Call 'advapi32::SystemFunction036(*i0r0,i1)'
@@ -112,7 +144,7 @@ Section "Install Section"
 		IntCmpU $0 10 "" badrange
 	DetailPrint $2
 
-	; Replace Client settings in the .ini file
+	; Replace Client settings in the .ini file - Info: https://nsis.sourceforge.io/Reference/WriteINIStr and https://nsis.sourceforge.io/Reference/ReadINIStr
 	WriteINIStr "$INSTDIR\Client\Mir2Test.ini" "Network" "UseConfig" "True"
 	WriteINIStr "$INSTDIR\Client\Mir2Test.ini" "Network" "IPAddress" "${CLIENT_IP}"
 	WriteINIStr "$INSTDIR\Client\Mir2Test.ini" "Network" "Port" "${CLIENT_PORT}"	
@@ -135,10 +167,13 @@ Section "Install Section"
 	WriteINIStr "$INSTDIR\Server\Configs\Setup.ini" "Optional" "SafeZoneBorder" "True"
 	WriteINIStr "$INSTDIR\Server\Configs\Setup.ini" "Optional" "SafeZoneHealing" "True"
 	
-	# create the uninstaller
+	; create the uninstaller - Info: https://nsis.sourceforge.io/Reference/WriteUninstaller
     WriteUninstaller "$INSTDIR\uninstall.exe"
 	
-    # Create Start Menu shortcuts
+    ; Create Start Menu shortcuts directory - Info: https://nsis.sourceforge.io/Reference/CreateShortCut
+	CreateDirectory "$SMPROGRAMS\${APP_NAME}"
+	
+	; Create shortcuts in Start Menu folder, SetOutPath determines "Start in" value - Info: https://nsis.sourceforge.io/Reference/CreateShortCut
 	SetOutPath "$INSTDIR\Client"
 	CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME} Client.lnk" "$INSTDIR\Client\Client.exe"
 	SetOutPath "$INSTDIR\Server"
@@ -150,7 +185,7 @@ Section "Install Section"
 	SetOutPath $INSTDIR
 	CreateShortcut "$SMPROGRAMS\${APP_NAME}\Uninstall ${APP_NAME}.lnk" "$INSTDIR\uninstall.exe"
 	
-	; Create desktop shortcuts, SetOutPath determines "Start in" value 
+	; Create desktop shortcuts, SetOutPath determines "Start in" value - Info: https://nsis.sourceforge.io/Reference/CreateShortCut
 	SetOutPath "$INSTDIR\Client" 
     CreateShortcut "$DESKTOP\${APP_NAME} Client.lnk" "$INSTDIR\Client\Client.exe"
 	SetOutPath "$INSTDIR\Server"
@@ -158,7 +193,7 @@ Section "Install Section"
 	SetOutPath $INSTDIR
     CreateShortcut "$DESKTOP\Uninstall ${APP_NAME}.lnk" "$INSTDIR\uninstall.exe"
 
-	; Add Uninstall to Add/Remove Programs in Windows Control Panel
+	; Add Uninstall to Add/Remove Programs in Windows Control Panel - Info: https://nsis.sourceforge.io/Add_uninstall_information_to_Add/Remove_Programs
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" \
                  "DisplayName" "${APP_NAME}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" \
@@ -174,24 +209,24 @@ Section "Install Section"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" \
                  "EstimatedSize" "9100000"
 
-				 
-	; Clean up
+	; Clean up temp files used
 	RMDir /r "$INSTDIR\Workspace"
 	RMDir /r "$INSTDIR\Downloads"
 	RMDir /r "$INSTDIR\Databases"
 	
-	; Inform user of completion and provide GM Pass
-	MessageBox MB_ICONINFORMATION "Installation Complete!! $\n Note: Client will download additional Data"
-	MessageBox MB_ICONINFORMATION "GM Password: $2 $\n(Use @login in-game)"
+	; Inform user of installer completion 
+	MessageBox MB_ICONINFORMATION "Installation Complete!!$\nNote: Client will download additional data"
+	
+	; Provide GM Password to user
+	MessageBox MB_ICONINFORMATION "GM Password: $2 $\n(Use @login whilst in-game)"
+	
 SectionEnd
 
 Section "un.Uninstall Section"
-    # Remove the shortcuts from the start menu
-    Delete "$SMPROGRAMS\Uninstall ${APP_NAME}.lnk"
-	Delete "$SMPROGRAMS\${APP_NAME}\Client\${APP_NAME} Client.lnk"
-	Delete "$SMPROGRAMS\${APP_NAME}\Server\${APP_NAME} Server.lnk"
+    # Remove the shortcuts folder from the start menu
+	RMDir /r "$SMPROGRAMS\${APP_NAME}"
 	
-	# Remove from Add/Remove Programs in Windows Control Panel
+	# Remove from Add/Remove Programs in Windows Control Panel - Info: Info: https://nsis.sourceforge.io/Add_uninstall_information_to_Add/Remove_Programs
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
 	
 	# Remove Desktop Shortcuts
@@ -199,8 +234,9 @@ Section "un.Uninstall Section"
     Delete "$DESKTOP\${APP_NAME} Server.lnk"
 	Delete "$DESKTOP\Uninstall ${APP_NAME}.lnk"
  
-	# Remove Directories
+	# Remove Install Directory
 	RMDir /r "$INSTDIR"
+	
 SectionEnd
 
 
