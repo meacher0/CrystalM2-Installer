@@ -1,7 +1,7 @@
 !include LogicLib.nsh
 
 ; Vars
-!define VERSION "1.0.0.1"
+!define VERSION "1.0.0.2"
 !define APP_NAME "CrystalM2"
 
 ; Define Download URLs
@@ -13,7 +13,7 @@
 !define HELP_URL "https://www.lomcn.net/wiki/index.php/Crystal"
 !define ABOUT_URL "https://github.com/meacher0/CrystalM2-Installer"
 
-; Define Client Network Configuration
+; Define Client Network Configuration - Info: https://www.lomcn.net/forum/threads/port-forwarding.106595/post-1205724
 !define CLIENT_IP "127.0.0.1"
 !define CLIENT_PORT "7000"
 
@@ -24,16 +24,20 @@
 ; Set name used for installer window
 Name "${APP_NAME} ${VERSION}"
 
+; Show Console Details as default - https://nsis.sourceforge.io/Reference/ShowInstDetails
+ShowInstDetails show
+
 ; Set Installer Exe's Properties\Details tab information
 !define LANG_ENGLISH "1033"
 VIProductVersion "${VERSION}"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${APP_NAME} Installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "${APP_NAME} Installer Application"
 ;VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Fake company"
-;VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalTrademarks" "${APP_NAME} is a trademark of Fake company"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "© Meacher0"
+;VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalTrademarks" "${APP_NAME}® is a trademark of Fake company"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "2024"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${APP_NAME} Installer Application"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VERSION}" 
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VERSION}"
 
 ; Set the output file for the new installer binary
 Outfile "${APP_NAME}_setup_${VERSION}.exe"
@@ -58,78 +62,90 @@ Section "Install Section"
 	;Set directory permissions using security ID - Info: https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/understand-security-identifiers
 	AccessControl::GrantOnFile $INSTDIR "(S-1-5-32-545)" "FullAccess"
 	
-    ; Check if .NET 8 is installed
-	ReadRegStr $0 HKLM "SOFTWARE\Classes\Installer\Dependencies\{942f6911-1a02-4186-8c4c-b27eb2b9733d}" "Version"
-	${If} $0 != "8.0.6.33720"
-		; .NET 8.0.6 is NOT installed, update GUI
-		DetailPrint "Downloading dotNET 8.0 Runtime..."
-		; Download dotNET 8.0.6 - Info: https://nsis.sourceforge.io/NScurl_plug-in
-		NScurl::http get "${NET8_URL}" "$INSTDIR\Downloads\dotnet-runtime-8.0.6-win-x64.exe" /INSIST /CANCEL /RESUME /POPUP /END
-		Pop $R0
-		${If} $R0 == "OK"
-			; Successfully downloaded, Update GUI
-			DetailPrint "Installing dotNET 8.0 Runtime..."
-			; Silently install dotNET 8.0.6
-			ExecWait '"$INSTDIR\Downloads\windowsdesktop-runtime-8.0.6-win-x64.exe" /install /quiet'
-		${Else}
-			; Handle download failure
-			MessageBox MB_ICONEXCLAMATION "Failed to download dotNET 8.0 runtime. Check Internet Connection Settings."
+	; Retry return Label
+	retry_dn_download:
+		; Check if .NET 8 is installed
+		ReadRegStr $0 HKLM "SOFTWARE\Classes\Installer\Dependencies\{942f6911-1a02-4186-8c4c-b27eb2b9733d}" "Version"
+		${If} $0 != "8.0.6.33720"
+			; .NET 8.0.6 is NOT installed, update GUI
+			DetailPrint "Downloading dotNET 8.0 Runtime..."
+			; Download dotNET 8.0.6 - Info: https://nsis.sourceforge.io/NScurl_plug-in
+			NScurl::http get "${NET8_URL}" "$INSTDIR\Downloads\dotnet-runtime-8.0.6-win-x64.exe" /CANCEL /RESUME /END
+			Pop $R0
+			${If} $R0 == "OK"
+				; Successfully downloaded, Update GUI
+				DetailPrint "Installing dotNET 8.0 Runtime..."
+				; Silently install dotNET 8.0.6
+				ExecWait '"$INSTDIR\Downloads\windowsdesktop-runtime-8.0.6-win-x64.exe" /install /quiet'
+			${Else}
+				; Handle download failure with retry option
+				MessageBox MB_ICONEXCLAMATION|MB_RETRYCANCEL "Failed to download dotNET 8.0.6.$\nCheck Internet Connection Settings.$\nClick Retry to attempt the download again." IDRETRY retry_dn_download
+				Abort ; If Cancel is clicked, abort the installation
+			${EndIf}
 		${EndIf}
-	${EndIf}
 	
-	; Check if VC2013 Redistributable is installed
-	ReadRegDWORD $0 HKLM "SOFTWARE\Classes\Installer\Dependencies\{050d4fc8-5d48-4b8f-8972-47c82c46020f}" "Version"
-	${If} $0 != "12.0.30501.0"
-		; redist is NOT installed, update GUI
-		DetailPrint "Downloading Visual C++ 2013 Redistributable..."
-		; Download VC2013 redist - Info: https://nsis.sourceforge.io/NScurl_plug-in
-		NScurl::http get "${VCR13_URL}" "$INSTDIR\Downloads\vcredist_x64.exe" /INSIST /CANCEL /RESUME /POPUP /END
-		Pop $R0
-		${If} $R0 == "OK"
-			; Successfully downloaded, update GUI
-			DetailPrint "Installing Visual C++ 2013 Redist..."
-			; Silently install VC2013 redist
-			ExecWait '"$INSTDIR\Downloads\vcredist_x64.exe" /install /quiet'
-		${Else}
-			; Handle download failure
-			MessageBox MB_ICONEXCLAMATION "Failed to download Visual C++ 2013 Redist. Check Internet Connection Settings."
+	; Retry return Label
+	retry_vc_download:
+		; Check if VC2013 Redistributable is installed
+		ReadRegDWORD $0 HKLM "SOFTWARE\Classes\Installer\Dependencies\{050d4fc8-5d48-4b8f-8972-47c82c46020f}" "Version"
+		${If} $0 != "12.0.30501.0"
+			; redist is NOT installed, update GUI
+			DetailPrint "Downloading Visual C++ 2013 Redistributable..."
+			; Download VC2013 redist - Info: https://nsis.sourceforge.io/NScurl_plug-in
+			NScurl::http get "${VCR13_URL}" "$INSTDIR\Downloads\vcredist_x64.exe" /CANCEL /RESUME /END
+			Pop $R0
+			${If} $R0 == "OK"
+				; Successfully downloaded, update GUI
+				DetailPrint "Installing Visual C++ 2013 Redist..."
+				; Silently install VC2013 redist
+				ExecWait '"$INSTDIR\Downloads\vcredist_x64.exe" /install /quiet'
+			${Else}
+				; Handle download failure with retry option
+				MessageBox MB_ICONEXCLAMATION|MB_RETRYCANCEL "Failed to download Visual C++ 2013 Redist.$\nCheck Internet Connection Settings.$\nClick Retry to attempt the download again." IDRETRY retry_vc_download
+				Abort ; If Cancel is clicked, abort the installation
+			${EndIf}
 		${EndIf}
-	${EndIf}
 	
-	; Update GUI
-	DetailPrint "Downloading CrystalM2 [10MB]..."
-	; Get CrystalM2 Stable Release - Info: https://nsis.sourceforge.io/NScurl_plug-in
-	NScurl::http get "${SCCM2_URL}" "$INSTDIR\Downloads\CrystalM2Stable.zip" /INSIST /CANCEL /RESUME /END
-	Pop $R0
-	${If} $R0 == "OK"
-		; Successfully downloaded zip, update GUI
-		DetailPrint "Installing CrystalM2 Stable Release..."
-		; extract zip to "workspace" temp folder - Info: https://nsis.sourceforge.io/Nsisunz_plug-in
-		nsisunz::UnzipToLog "$INSTDIR\Downloads\CrystalM2Stable.zip" "$INSTDIR\Workspace"
-		; Copy extracted files to "Program Files"
-		CopyFiles "$INSTDIR\Workspace\Crystal_14.06.2024_Debug\*" $INSTDIR
+	; Label to return to if Crystal files fail to download and user clicks retry
+	retry_cm_download:
 		; Update GUI
-		DetailPrint "Downloading CrystalM2 Database [215MB]..."
-		; Get Crystal Databases zip
-		NScurl::http get "${DB_URL}" "$INSTDIR\Downloads\Databases.zip" /INSIST /CANCEL /RESUME /END
+		DetailPrint "Downloading CrystalM2 [10MB]..."
+		; Get CrystalM2 Stable Release - Info: https://nsis.sourceforge.io/NScurl_plug-in
+		NScurl::http get "${SCCM2_URL}" "$INSTDIR\Downloads\CrystalM2Stable.zip" /CANCEL /RESUME /END
 		Pop $R0
 		${If} $R0 == "OK"
-			; Successfully downloaded zip, install
-			DetailPrint "Extracting CrystalM2 Database..."
-			; Extract zip to "Databases" temp folder - Info: https://nsis.sourceforge.io/Nsisunz_plug-in
-			nsisunz::UnzipToLog "$INSTDIR\Downloads\Databases.zip" "$INSTDIR\Databases"
+			; Successfully downloaded zip, update GUI
+			DetailPrint "Installing CrystalM2 Stable Release..."
+			; extract zip to "workspace" temp folder - Info: https://nsis.sourceforge.io/Nsisunz_plug-in
+			nsisunz::UnzipToLog "$INSTDIR\Downloads\CrystalM2Stable.zip" "$INSTDIR\Workspace"
+			; Copy extracted files to "Program Files"
+			CopyFiles "$INSTDIR\Workspace\Crystal_14.06.2024_Debug\*" $INSTDIR
 			; Update GUI
-			DetailPrint "Copying Jev's Database Files..."
-			; Copy files from temp folder to Server dir
-			CopyFiles "$INSTDIR\Databases\Crystal.Database-main\Jev\*" "$INSTDIR\Server"
+			DetailPrint "Downloading CrystalM2 Database [215MB]..."
+			; Label to return to if download fails and user retries
+			retry_db_download:
+				; Get Crystal Databases zip
+				NScurl::http get "${DB_URL}" "$INSTDIR\Downloads\Databases.zip" /CANCEL /RESUME /END
+				Pop $R0
+				${If} $R0 == "OK"
+					; Successfully downloaded zip, install
+					DetailPrint "Extracting CrystalM2 Database..."
+					; Extract zip to "Databases" temp folder - Info: https://nsis.sourceforge.io/Nsisunz_plug-in
+					nsisunz::UnzipToLog "$INSTDIR\Downloads\Databases.zip" "$INSTDIR\Databases"
+					; Update GUI
+					DetailPrint "Copying Jev's Database Files..."
+					; Copy files from temp folder to Server dir
+					CopyFiles "$INSTDIR\Databases\Crystal.Database-main\Jev\*" "$INSTDIR\Server"
+				${Else}
+					; Handle download failure with retry option
+					MessageBox MB_ICONEXCLAMATION|MB_RETRYCANCEL "Failed to download Database.$\nCheck Internet Connection Settings.$\nClick Retry to attempt the download again." IDRETRY retry_db_download
+					Abort ; If Cancel is clicked, abort the installation
+				${EndIf}
 		${Else}
-			; Handle failure
-			MessageBox MB_ICONEXCLAMATION "Failed to install CrystalM2 Database$\nCheck Internet Connection"
+			; Handle download failure with retry option
+			MessageBox MB_ICONEXCLAMATION|MB_RETRYCANCEL "Failed to download CrystalM2.$\nCheck Internet Connection Settings.$\nClick Retry to attempt the download again." IDRETRY retry_cm_download
+			Abort ; If Cancel is clicked, abort the installation
 		${EndIf}
-	${Else}
-		; Handle failure
-		MessageBox MB_ICONEXCLAMATION "Failed to install CrystalM2$\nCheck Internet connection"
-	${EndIf}
 
 	; Generate Random New GMPassword - taken from https://stackoverflow.com/questions/19195286/generate-a-10-digit-alphanumeric-string-in-nsis
 	StrCpy $2 ""
