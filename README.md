@@ -5,25 +5,31 @@
 This N.S.I.S. Script was created in an attempt to ease the initial setup and configuration of the Crystal M2 Server and Client. Once compiled and executed, it should Download, Install and Configure the CrystalM2 files ready for use (with the exception of the Client which will download additional data when first opened following Installation).
 
 ## Features
--Check/Install Pre-Requisite: dotNET 8.0 Runtime\
--Check/Install Pre-Requisite: Visual C++ 2013 Runtime\
--Download and Install CrystalM2 Server/Client\
--Download and Install CrystalM2 Database Files\
--Option to Retry Download on failure to connect\
--Resume Download Automatically if part way downloaded\
--Create Uninstaller executeable\
--Add Uninstall to Add/Remove Programs\
--Create Desktop Shortcuts\
--Create StartMenu Shortcuts\
--Randomly Generate GM Password\
--Configure Server to AllowGameStart\
--Set Server IP (Default: 0.0.0.0)\
--Set Client IP (Default: 127.0.0.1)
+- Check/Install Pre-Requisite: dotNET 8.0 Runtime
+- Check/Install Pre-Requisite: Visual C++ 2013 Runtime
+- Download and Install CrystalM2 Server/Client
+- Download and Install CrystalM2 Database Files
+- Option to Retry Download on failure to connect
+- Resume Download Automatically if part way downloaded
+- Create Uninstaller executeable
+- Add Uninstall to Add/Remove Programs
+- Create Desktop Shortcuts
+- Create StartMenu Shortcuts
+- Randomly Generate GM Password
+- Configure Server to AllowGameStart
+- Set Server IP (Default: 0.0.0.0)
+- Set Client IP (Default: 127.0.0.1)
 
 ## Requirements
-This script is compiled using the NullSoft Scriptable Install System software and as such, is required to compile this script yourself.\
-The N.S.I.S. software is OpenSource and available to download at [SourceForge](https://nsis.sourceforge.io/Download) \
-You can also download the pre-compiled binary of this installer from the [Releases section](https://github.com/meacher0/CrystalM2-Installer/releases)
+This script is compiled using the NullSoft Scriptable Install System software and as such, is required to compile this script yourself. There are also some plugins required to prevent errors when comipling the installer binary, these are listed below.
+- The N.S.I.S. software is OpenSource and available to download at [SourceForge](https://nsis.sourceforge.io/Download) 
+- You can also download the pre-compiled binary of this installer from the [Releases section](https://github.com/meacher0/CrystalM2-Installer/releases)
+
+### NSIS Plugins
+The Following Plugins are used for various operations within the Script. Copy DLL's to the relevant plugin directory inside the NSIS install directory.
+- [AccessControl - https://nsis.sourceforge.io/AccessControl_plug-in](https://nsis.sourceforge.io/AccessControl_plug-in) 
+- [NScurl - https://nsis.sourceforge.io/NScurl_plug-in](https://nsis.sourceforge.io/NScurl_plug-in) 
+- [NSISunz - https://nsis.sourceforge.io/Nsisunz_plug-in](https://nsis.sourceforge.io/Nsisunz_plug-in)
 
 ### Command Line Usage
 > makensis.exe [Script]
