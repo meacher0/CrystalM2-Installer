@@ -1,8 +1,9 @@
 # CrystalM2-Installer
-[Download Pre-Compiled CrystalM2 Installer](https://github.com/meacher0/CrystalM2-Installer/releases)
+[Download Pre-Compiled CrystalM2 Installer](https://github.com/meacher0/CrystalM2-Installer/releases) to get started with CrystalM2.
+Note: Only tested on Microsoft Windows 11, 64-bit
 
 # Overview
-This N.S.I.S. Script was created in an attempt to ease the initial setup and configuration of the Crystal M2 Server and Client. Once compiled and executed, it should Download, Install and Configure the CrystalM2 files ready for use (with the exception of the Client which will download additional data when first opened following Installation).
+This N.S.I.S. Script was created in an attempt to ease the initial setup and configuration of the Crystal M2 Server and Client. Once compiled and executed, it should Download, Install and Configure the CrystalM2 files ready for use (with the exception of the Client which, will download additional data when first opened following Installation).
 
 ## Features
 - Check/Install Pre-Requisite: dotNET 8.0 Runtime
@@ -21,7 +22,7 @@ This N.S.I.S. Script was created in an attempt to ease the initial setup and con
 - Set Client IP (Default: 127.0.0.1)
 
 ## Requirements
-This script is compiled using the NullSoft Scriptable Install System software and as such, is required to compile this script yourself. There are also some plugins required to prevent errors when comipling the installer binary, these are listed below.
+This script is compiled using the NullSoft Scriptable Install System software and as such, is required to compile this script yourself. There are also some plugins required to prevent errors when compiling the installer binary, these are listed below.
 - The N.S.I.S. software is OpenSource and available to download at [SourceForge](https://nsis.sourceforge.io/Download) 
 - You can also download the pre-compiled binary of this installer from the [Releases section](https://github.com/meacher0/CrystalM2-Installer/releases)
 
