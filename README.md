@@ -8,6 +8,7 @@ This N.S.I.S. Script was created in an attempt to ease the initial setup and con
 ## Features
 - Check/Install Pre-Requisite: dotNET 8.0 Runtime
 - Check/Install Pre-Requisite: Visual C++ 2013 Runtime
+- Check/Install Pre-Requisite: WebView2 Runtime
 - Download and Install CrystalM2 Server/Client
 - Download and Install CrystalM2 Database Files
 - Option to Retry Download on failure to connect
