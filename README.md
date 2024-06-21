@@ -1,6 +1,7 @@
 # CrystalM2-Installer
-[Download Pre-Compiled CrystalM2 Installer](https://github.com/meacher0/CrystalM2-Installer/releases) to get started with CrystalM2.
-Note: Only tested on Microsoft Windows 11, 64-bit
+[Download Pre-Compiled CrystalM2 Installer](https://github.com/meacher0/CrystalM2-Installer/releases) to get started with CrystalM2.\
+Tested on Microsoft Windows 11, 64-bit. \
+May also work on Windows 10, 64-bit 
 
 # Overview
 This N.S.I.S. Script was created in an attempt to ease the initial setup and configuration of the Crystal M2 Server and Client. Once compiled and executed, it should Download, Install and Configure the CrystalM2 files ready for use (with the exception of the Client which, will download additional data when first opened following Installation).
