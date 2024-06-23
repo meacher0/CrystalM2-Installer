@@ -59,4 +59,5 @@ A: The GM Password can be located in "C:\Program Files\CrystalM2\Server\Configs\
 
 ## Notes
 Thanks to [Suprcode](https://github.com/Suprcode) and the [other contributors](https://github.com/Suprcode/Crystal/graphs/contributors) to the [Crystal Source Code](https://github.com/Suprcode/Crystal).\
-Thanks to [Jev](https://github.com/JevLOMCN) for maintaining the [Crystal Database Files](https://github.com/Suprcode/Crystal.Database).
+Thanks to [Jev](https://github.com/JevLOMCN) for maintaining the [Crystal Database Files](https://github.com/Suprcode/Crystal.Database).\
+[Buy me a coffee](https://www.buymeacoffee.com/danraine)
