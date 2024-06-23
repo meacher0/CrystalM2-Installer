@@ -22,6 +22,9 @@ This N.S.I.S. Script was created in an attempt to ease the initial setup and con
 - Configure Server to AllowGameStart
 - Set Server IP (Default: 0.0.0.0)
 - Set Client IP (Default: 127.0.0.1)
+- Add Firewall rule for Server
+- Chinese Language Support
+- Korean Language Support
 
 ## Requirements
 This script is compiled using the NullSoft Scriptable Install System software and as such, is required to compile this script yourself. There are also some plugins required to prevent errors when compiling the installer binary, these are listed below.
