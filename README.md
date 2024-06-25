@@ -1,10 +1,11 @@
 # LOM-Installer
-[Download Pre-Compiled LOM Installer](https://github.com/meacher0/CrystalM2-Installer/releases) to get started with CarbonM1, CrystalM2 or ZirconM3.\
+[Download Pre-Compiled LOMCN Software Installer](https://github.com/meacher0/CrystalM2-Installer/releases) to get started with CarbonM1, CrystalM2 or ZirconM3.\
+[Download Pre-Compiled CrystalM2 Installer](https://github.com/meacher0/CrystalM2-Installer/releases/tag/v1.2.0.1) to get start with Crystal M2. \
 Tested on Microsoft Windows 11, 64-bit. \
 May also work on Windows 10, 64-bit 
 
 # Overview
-These N.S.I.S. Scripts was created in an attempt to ease the initial setup and configuration of the Crystal M2 Server and Client. Once compiled and executed, it should Download, Install and Configure the CrystalM2 files ready for use (with the exception of the Client which, will download additional data when first opened following Installation).
+These N.S.I.S. Scripts was created in an attempt to ease the initial setup and configuration of the Crystal M2 Server and Client. Once compiled and executed, it should Download, Install and Configure the CrystalM2 files ready for use (with the exception of the Client which, will download additional data when first opened following Installation). \
 
 CM2I.nsi - Crystal Only Installer. \
 MMI.nsi - Multi-installer for Carbon, Crystal and Zircon in a single installer.
