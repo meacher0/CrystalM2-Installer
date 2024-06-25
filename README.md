@@ -6,7 +6,7 @@ May also work on Windows 10, 64-bit
 # Overview
 These N.S.I.S. Scripts was created in an attempt to ease the initial setup and configuration of the Crystal M2 Server and Client. Once compiled and executed, it should Download, Install and Configure the CrystalM2 files ready for use (with the exception of the Client which, will download additional data when first opened following Installation).
 
-CM2I.nsi - Crystal Installer
+CM2I.nsi - Crystal Only Installer. \
 MMI.nsi - Multi-installer for Carbon, Crystal and Zircon in a single installer.
 
 ## Features
