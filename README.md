@@ -1,5 +1,5 @@
 # LOM-Installer
-[Download Pre-Compiled LOMCN Software Installer](https://github.com/meacher0/CrystalM2-Installer/releases) to get started with CarbonM1, CrystalM2 or ZirconM3.\
+[Download Pre-Compiled LOMCN Software Installer](https://github.com/meacher0/CrystalM2-Installer/releases/tag/v2.0.0.0) to get started with CarbonM1, CrystalM2 or ZirconM3.\
 [Download Pre-Compiled CrystalM2 Installer](https://github.com/meacher0/CrystalM2-Installer/releases/tag/v1.2.0.1) to get start with Crystal M2. \
 Tested on Microsoft Windows 11, 64-bit. \
 May also work on Windows 10, 64-bit 
