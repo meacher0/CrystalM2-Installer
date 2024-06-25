@@ -1,5 +1,5 @@
-# CrystalM2-Installer
-[Download Pre-Compiled CrystalM2 Installer](https://github.com/meacher0/CrystalM2-Installer/releases) to get started with CarbonM1, CrystalM2 or ZirconM3.\
+# LOM-Installer
+[Download Pre-Compiled LOM Installer](https://github.com/meacher0/CrystalM2-Installer/releases) to get started with CarbonM1, CrystalM2 or ZirconM3.\
 Tested on Microsoft Windows 11, 64-bit. \
 May also work on Windows 10, 64-bit 
 
@@ -65,6 +65,6 @@ A only 1 server cna be open at a time unless the network config is updated from 
 
 ## Notes
 Thanks to [Suprcode](https://github.com/Suprcode) and the [other contributors](https://github.com/Suprcode/Crystal/graphs/contributors) to the [Crystal Source Code](https://github.com/Suprcode/Crystal).\
-Thanks to [Jev](https://github.com/JevLOMCN) for maintaining the [Carbon Repo](https://github.com/JevLOMCN/mir1) and [Crystal Database Files](https://github.com/Suprcode/Crystal.Database).\
+Thanks to [Jev](https://github.com/JevLOMCN) for maintaining the [Carbon Repo](https://github.com/JevLOMCN/mir1) and both [Carbon](https://github.com/Suprcode/Carbon.Database) and [Crystal Database Files](https://github.com/Suprcode/Crystal.Database).\
 Thanks to [Suprcode](https://github.com/Suprcode) for maintaining the [Zircon Repo](https://github.com/Suprcode/Zircon) \
 [Buy me a coffee](https://www.buymeacoffee.com/danraine)
