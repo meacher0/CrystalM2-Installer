@@ -1,5 +1,5 @@
 # LOM-Installer
-[Download Pre-Compiled LOMCN Software Installer](https://github.com/meacher0/CrystalM2-Installer/releases/tag/v2.0.0.0) to get started with CarbonM1, CrystalM2 or ZirconM3.\
+[Download Pre-Compiled LOMCN Software Installer](https://github.com/meacher0/CrystalM2-Installer/releases/tag/v2.1.0.0) to get started with CarbonM1, CrystalM2 or ZirconM3.\
 [Video Showcase for Multi-installer](https://youtu.be/uGNhvdSf1hg) \
  \
 [Download Pre-Compiled CrystalM2 Installer](https://github.com/meacher0/CrystalM2-Installer/releases/tag/v1.2.0.1) to get start with Crystal M2. \
@@ -14,6 +14,7 @@ CM2I.nsi - Crystal Only Installer. \
 MMI.nsi - Multi-installer for Carbon, Crystal and Zircon in a single installer.
 
 ## Features
+- Welcome, Licence, Components and Finish MUI Pages
 - Check/Install Pre-Requisite: ASP.NET 7.0 Runtime
 - Check/Install Pre-Requisite: dotNET 7.0 Runtime
 - Check/Install Pre-Requisite: dotNET 8.0 Runtime
@@ -66,6 +67,9 @@ A: The GM Password can be located in "C:\Program Files\CrystalM2\Server\Configs\
 
 Q: I get an Error when opening a second server, something about sockets.
 A only 1 server cna be open at a time unless the network config is updated from 0.0.0.0 to the LAN IP of the Host.
+
+Q: When i open Zircon Server i get a WinForms trial message, whats that about?
+A: I have no idea anymore, search lomcn for answers.
 
 ## Notes
 Thanks to [Suprcode](https://github.com/Suprcode) and the [other contributors](https://github.com/Suprcode/Crystal/graphs/contributors) to the [Crystal Source Code](https://github.com/Suprcode/Crystal).\
